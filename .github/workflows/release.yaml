@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest]
+        swift: ["5.10"]
+
+    runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        working-directory: ./app
+
+    steps:
+      - uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: ${{ matrix.swift }}
+
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: swift build
+
+      - name: Test
+        run: swift test
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: agenda
+          path: ./app/.build/debug/agenda
+
+  publish:
+    name: Publish Workflow
+
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: agenda
+          path: ./workflow
+
+      - run: chmod +x ./workflow/agenda
+
+      - name: Build Alfred workflow
+        id: builder
+        uses: almibarss/build-alfred-workflow@main
+        with:
+          workflow_dir: ./workflow
+          exclude_patterns: .git/* .github/*
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: ${{ endsWith(github.ref, '-alpha') || endsWith(github.ref, '-beta') }}
+          files: ${{ steps.builder.outputs.workflow_file }}

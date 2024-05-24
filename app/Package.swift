@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "reminders",
+    name: "agenda",
     platforms: [
         .macOS(.v10_15)
     ],
@@ -11,7 +11,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "reminders",
+            name: "agenda",
             dependencies: ["RemindersLibrary"]
         ),
         .target(
