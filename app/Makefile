@@ -4,7 +4,10 @@ ARCHIVE=$(EXECUTABLE).tar.gz
 
 .PHONY: clean build-release package
 
-build-release:
+test:
+	swift test
+
+build-release: test
 	swift build --configuration release -Xswiftc -warnings-as-errors
 
 package: build-release
