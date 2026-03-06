@@ -96,23 +96,52 @@ public final class CalendarEvents {
         }
     }
 
-    func events(listName: String?, limit: Int?, startOfDay: Bool) {
-        let calendar = listName != nil ? self.calendar(withName: listName!) : nil
+    func events(
+        listName: String?,
+        limit: Int?,
+        startOfDay: Bool,
+        excludePatterns: [String] = []
+    ) {
+        let cal = listName != nil ? self.calendar(withName: listName!) : nil
         let semaphore = DispatchSemaphore(value: 0)
 
-        let startOfToday = Calendar.current.startOfDay(for: Date())
+        let now = Date()
+        let start = startOfDay
+            ? Calendar.current.startOfDay(for: now) : now
+        let next: Date
+        if limit == 0 {
+            let tomorrow = Calendar.current.date(
+                byAdding: .day, value: 1, to: now)!
+            next = Calendar.current.startOfDay(for: tomorrow)
+        } else {
+            let days: TimeInterval =
+                Double((limit ?? 5) * 24 * 3600)
+            next = start.addingTimeInterval(days)
+        }
+        let calendars = cal != nil ? [cal!] : []
 
-        let days:TimeInterval = Double((limit == nil ? 5 : limit!)*24*3600)
-        let next = startOfToday.addingTimeInterval(days)
-        let calendars = calendar != nil ? [calendar!] : []
+        let regexes = excludePatterns.compactMap {
+            try? NSRegularExpression(
+                pattern: $0, options: .caseInsensitive)
+        }
 
-        let predicate = Store.predicateForEvents(withStart: startOfToday, end: next, calendars: calendars)
-
+        let predicate = Store.predicateForEvents(
+            withStart: start, end: next, calendars: calendars)
         let events = Store.events(matching: predicate)
 
-        if events.count == 0 { semaphore.signal() }
+        let filtered = events.filter { event in
+            guard let title = event.title else { return true }
+            return !regexes.contains { regex in
+                let range = NSRange(
+                    title.startIndex..., in: title)
+                return regex.firstMatch(
+                    in: title, range: range) != nil
+            }
+        }
 
-        for event in events {
+        if filtered.count == 0 { semaphore.signal() }
+
+        for event in filtered {
             print(format(event))
             semaphore.signal()
         }

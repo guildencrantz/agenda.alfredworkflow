@@ -130,11 +130,18 @@ private struct Events: ParsableCommand {
         help: "Show events from the start of today instead of now")
     var startOfDay: Bool = false
 
+    @Option(
+        name: .shortAndLong,
+        parsing: .upToNextOption,
+        help: "Regex patterns for event titles to exclude")
+    var exclude: [String] = []
+
     func run() {
         calendarEvents.events(
             listName: self.listName,
             limit: self.limit,
-            startOfDay: self.startOfDay)
+            startOfDay: self.startOfDay,
+            excludePatterns: self.exclude)
     }
 }
 
