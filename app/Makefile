@@ -1,3 +1,5 @@
+.DEFAULT_GOAL: build-release
+
 RELEASE_BUILD=./.build/release
 EXECUTABLE=reminders
 ARCHIVE=$(EXECUTABLE).tar.gz
