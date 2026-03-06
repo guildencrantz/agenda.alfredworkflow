@@ -49,7 +49,14 @@ if [ -n "$pre_part" ]; then
     new_version="$base"
     if [ -n "$new_pre" ]; then new_version="$new_version-$new_pre"; fi
     prev_tag_msg=$(git tag -n1 "v$latest" 2>/dev/null | sed 's/^[^ ]* *//')
-    read -e -p "Tag message: " -i "$prev_tag_msg" tag_msg
+    tag_tmp=$(mktemp)
+    echo "$prev_tag_msg" > "$tag_tmp"
+    ${GIT_EDITOR:-$(git var GIT_EDITOR)} "$tag_tmp"
+    tag_msg=$(cat "$tag_tmp")
+    rm -f "$tag_tmp"
+    if [ -z "$(echo "$tag_msg" | tr -d '[:space:]')" ]; then
+        echo "Aborted: empty tag message."; exit 0
+    fi
     commit_msg="chore: bump version to $new_version"
 
 else
@@ -72,7 +79,13 @@ else
     esac
     new_version="$major.$minor.$patch"
     if [ -n "$pre" ]; then new_version="$new_version-${pre}.1"; fi
-    read -e -p "Tag message: " tag_msg
+    tag_tmp=$(mktemp)
+    ${GIT_EDITOR:-$(git var GIT_EDITOR)} "$tag_tmp"
+    tag_msg=$(cat "$tag_tmp")
+    rm -f "$tag_tmp"
+    if [ -z "$(echo "$tag_msg" | tr -d '[:space:]')" ]; then
+        echo "Aborted: empty tag message."; exit 0
+    fi
     commit_msg="chore: bump version to $new_version"
 fi
 
