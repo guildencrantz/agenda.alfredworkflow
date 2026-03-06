@@ -746,6 +746,19 @@
 				<false/>
 			</dict>
 		</array>
+		<key>87979525-08DE-446C-AEA2-A393F77AF78B</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>FC199182-1558-46F3-8377-44727579AC8B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>8C6BFF1D-4BAC-49F7-8BB1-471A881C15F9</key>
 		<array>
 			<dict>
@@ -1190,6 +1203,39 @@
 				<false/>
 			</dict>
 		</array>
+		<key>FC199182-1558-46F3-8377-44727579AC8B</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>5CCDD2B9-2524-4B5C-A502-1959D622A2CC</string>
+				<key>modifiers</key>
+				<integer>524288</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>A55E1FC2-5B38-4743-A9EF-7D0242C31AF3</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>E4A7D50E-0A7A-40E8-AF2C-B76D0E4ED2C1</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>FCA6B1E0-012D-4487-8F79-7FC6FF2A27F6</key>
 		<array>
 			<dict>
@@ -1304,6 +1350,84 @@
 				<key>runningsubtext</key>
 				<string>Loading Agenda...</string>
 				<key>script</key>
+				<string>osascript ./scripts/upcoming/index.js 'false' 'true' 0</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string></string>
+				<key>title</key>
+				<string>Upcoming Events</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>FC199182-1558-46F3-8377-44727579AC8B</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>action</key>
+				<integer>0</integer>
+				<key>argument</key>
+				<integer>0</integer>
+				<key>focusedappvariable</key>
+				<false/>
+				<key>focusedappvariablename</key>
+				<string></string>
+				<key>hotkey</key>
+				<integer>11</integer>
+				<key>hotmod</key>
+				<integer>1310720</integer>
+				<key>hotstring</key>
+				<string>X</string>
+				<key>leftcursor</key>
+				<false/>
+				<key>modsmode</key>
+				<integer>0</integer>
+				<key>relatedAppsMode</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.hotkey</string>
+			<key>uid</key>
+			<string>87979525-08DE-446C-AEA2-A393F77AF78B</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<true/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<true/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Loading Agenda...</string>
+				<key>script</key>
 				<string>osascript ./scripts/upcoming/index.js 'false' 'true' 1</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
@@ -1337,11 +1461,11 @@
 				<key>focusedappvariablename</key>
 				<string></string>
 				<key>hotkey</key>
-				<integer>11</integer>
+				<integer>40</integer>
 				<key>hotmod</key>
 				<integer>1310720</integer>
 				<key>hotstring</key>
-				<string>X</string>
+				<string>T</string>
 				<key>leftcursor</key>
 				<false/>
 				<key>modsmode</key>
@@ -4478,6 +4602,13 @@ fi</string>
 			<key>ypos</key>
 			<real>3800</real>
 		</dict>
+		<key>87979525-08DE-446C-AEA2-A393F77AF78B</key>
+		<dict>
+			<key>xpos</key>
+			<real>695</real>
+			<key>ypos</key>
+			<real>145</real>
+		</dict>
 		<key>8C6BFF1D-4BAC-49F7-8BB1-471A881C15F9</key>
 		<dict>
 			<key>xpos</key>
@@ -4671,7 +4802,7 @@ fi</string>
 		<key>C7C1E92A-4A6C-4EBF-B88E-40020E5A2DA0</key>
 		<dict>
 			<key>xpos</key>
-			<real>825</real>
+			<real>700</real>
 			<key>ypos</key>
 			<real>285</real>
 		</dict>
@@ -4746,7 +4877,7 @@ fi</string>
 		<key>DC490F5F-7A4B-4C19-84B3-026E857DC8EC</key>
 		<dict>
 			<key>xpos</key>
-			<real>1000</real>
+			<real>895</real>
 			<key>ypos</key>
 			<real>285</real>
 		</dict>
@@ -4829,6 +4960,13 @@ fi</string>
 			<real>1310</real>
 			<key>ypos</key>
 			<real>290</real>
+		</dict>
+		<key>FC199182-1558-46F3-8377-44727579AC8B</key>
+		<dict>
+			<key>xpos</key>
+			<real>895</real>
+			<key>ypos</key>
+			<real>145</real>
 		</dict>
 		<key>FCA6B1E0-012D-4487-8F79-7FC6FF2A27F6</key>
 		<dict>
