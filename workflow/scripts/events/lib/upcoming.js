@@ -45,9 +45,10 @@ var UpcomingEvents = (function() {
 
         const calendarURI = encodeURIComponent(parsed.calendar)
         const titleURI = encodeURIComponent(parsed.title)
-        const eventTSisoSeconds = encodeURIComponent(eventTS.toISOString()).replace('.000Z', 'Z')
+        const eventTSiso = eventTS.toISOString().replace('.000Z', 'Z')
 
         if (todayOnly && !parsed.start.includes(todayDateString)) return
+        if (!todayOnly && endTS < todayTS) return
         let dateOutput = parsed.allDay ? 'All Day' : eventStartTime
         let sort = parsed.allDay ? 'All Day' : eventStartTime
         if (!todayOnly) {
@@ -112,10 +113,10 @@ var UpcomingEvents = (function() {
 
         if (todayOnly) subtitle = subtitle.replace('Today at ', '')
 
-        busycalURI = encodeURI(`busycalevent://find/${parsed.calendar}/${parsed.title}/${eventTSisoSeconds}`)
-        // If the current time is in the meeting time range, set arge to `c:${findURI}` and `parsed.meeting_url`
-        const findURI = `find/${encodeURIComponent(parsed.calendar)}/${encodeURIComponent(parsed.title)}/${eventTSisoSeconds}`
-        let arg = $.getenv('use_busycal') ? `c:${busycalURI}` : `c:${findURI}`
+        busycalURI = `busycalevent://find/${encodeURIComponent(parsed.calendar)}/${encodeURIComponent(parsed.title)}/${encodeURIComponent(eventTSiso)}`
+        // If the current time is in the meeting time range, append meeting_url to arg
+        const findURI = `find/${encodeURIComponent(parsed.calendar)}/${encodeURIComponent(parsed.title)}/${encodeURIComponent(eventTSiso)}`
+        let arg = $.getenv('use_busycal') === 'true' ? `c:${busycalURI}` : `c:${findURI}`
         if (eventTS < todayTS && todayTS < endTS) {
           arg += `,${parsed.meeting_url}`
         }
