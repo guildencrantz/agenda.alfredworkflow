@@ -115,7 +115,7 @@ var UpcomingEvents = (function() {
         busycalURI = encodeURI(`busycalevent://find/${parsed.calendar}/${parsed.title}/${eventTSisoSeconds}`)
         // If the current time is in the meeting time range, set arge to `c:${findURI}` and `parsed.meeting_url`
         const findURI = `find/${encodeURIComponent(parsed.calendar)}/${encodeURIComponent(parsed.title)}/${eventTSisoSeconds}`
-        let arg = $.getenv('use_busycal') ? c:${busycalURI}` : `c:${findURI}`
+        let arg = $.getenv('use_busycal') ? `c:${busycalURI}` : `c:${findURI}`
         if (eventTS < todayTS && todayTS < endTS) {
           arg += `,${parsed.meeting_url}`
         }
@@ -123,7 +123,7 @@ var UpcomingEvents = (function() {
         items.push({
           title: parsed.title,
           subtitle,
-          arg: `c:${busycalURI}` : arg,
+          arg: arg,
           autocomplete: parsed.title,
           icon: {
             path: `icons/${icon}.png`,
