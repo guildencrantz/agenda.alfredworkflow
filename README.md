@@ -10,17 +10,17 @@ The first time you execute this workflow you'll see a macOS warning:
 
 !["agenda" can't be opened because Apple cannot check it for malicious software.](./screenshots/InstallError.png)
 
-To allow the `agenda` app (used to talk to the calendar for events and reminders)
-you can hit the `Show in Finder` button. Right click on the `agenda` binary and
-hold down the `option` key on your keyboard: The menu should now show `Always Open`
-as the second item, however if you press `Open` (the first item) you should get
-pop-up that's _very_ similar to the first one, only this one has an `Open` button:
+To allow the `agenda` binary to run:
 
+1. In Alfred Preferences, find the **Agenda** workflow in the sidebar
+2. Right-click it and choose **Open in Terminal** — this will open a terminal in the workflow's directory
+3. Run the following command in that terminal:
 
-![Open Warning Pop-up](./screenshots/OpenWarning.png)
+```bash
+xattr -dr com.apple.quarantine agenda
+```
 
-If you click `Open` it'll open in the `termal`: You can just close that `terminal`
-window and the workflow should be working.
+After that the workflow should work normally.
 
 # Acknowledgement
 
