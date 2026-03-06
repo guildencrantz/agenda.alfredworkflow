@@ -4988,6 +4988,8 @@ fi</string>
 		<string>Calendar</string>
 		<key>default_reminder_list</key>
 		<string>Tasks</string>
+		<key>event_exclude_patterns</key>
+		<string></string>
 		<key>overview_enabled</key>
 		<string>false</string>
 		<key>overview_mode</key>
