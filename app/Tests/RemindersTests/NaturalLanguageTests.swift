@@ -26,9 +26,8 @@ final class NaturalLanguageTests: XCTestCase {
         let tomorrow = try XCTUnwrap(Calendar.current.date(byAdding: .day, value: 1, to: Date()))
         let tomorrowAt9 = try XCTUnwrap(
             Calendar.current.date(bySettingHour: 21, minute: 0, second: 0, of: tomorrow))
-        let expectedComponents = Calendar.current.dateComponents(calendarComponents(), from: tomorrowAt9)
 
-        XCTAssertEqual(components, expectedComponents)
+        XCTAssertEqual(Calendar.current.date(from: components), tomorrowAt9)
     }
 
     func testRelativeDayCount() throws {

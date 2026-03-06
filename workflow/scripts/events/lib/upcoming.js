@@ -4,7 +4,8 @@ var UpcomingEvents = (function() {
       var app = Application.currentApplication();
       app.includeStandardAdditions = true;
 
-      const events = app.doShellScript(`./agenda events${listName ? ` "${listName}"`: ''} --limit ${limit};`)
+      const flags = todayOnly ? '--start-of-day --limit 0' : `--limit ${limit}`
+      const events = app.doShellScript(`./agenda events${listName ? ` "${listName}"`: ''} ${flags};`)
 
       const todayTS = new Date()
       const todayDate = todayTS.getDate() < 10 ? `0${todayTS.getDate()}` : todayTS.getDate();

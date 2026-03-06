@@ -123,11 +123,18 @@ private struct Events: ParsableCommand {
 
     @Option(
         name: .shortAndLong,
-        help: "The amount of days to show")
+        help: "The amount of days to show. Use 0 to show until midnight tonight.")
     var limit: Int?
 
+    @Flag(
+        help: "Show events from the start of today instead of now")
+    var startOfDay: Bool = false
+
     func run() {
-        calendarEvents.events(listName: self.listName, limit: self.limit)
+        calendarEvents.events(
+            listName: self.listName,
+            limit: self.limit,
+            startOfDay: self.startOfDay)
     }
 }
 

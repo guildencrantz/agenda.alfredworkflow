@@ -96,17 +96,25 @@ public final class CalendarEvents {
         }
     }
 
-    func events(listName: String?, limit: Int?) {
+    func events(listName: String?, limit: Int?, startOfDay: Bool) {
         let calendar = listName != nil ? self.calendar(withName: listName!) : nil
         let semaphore = DispatchSemaphore(value: 0)
 
-        let now = Date()
+        let start = startOfDay
+            ? Calendar.current.startOfDay(for: Date())
+            : Date()
 
-        let days:TimeInterval = Double((limit == nil ? 5 : limit!)*24*3600)
-        let next = Date(timeIntervalSinceNow: +days)
+        let next: Date
+        if limit == 0 {
+            next = Calendar.current.startOfDay(
+                for: Calendar.current.date(byAdding: .day, value: 1, to: Date())!)
+        } else {
+            let days: TimeInterval = Double((limit ?? 5) * 24 * 3600)
+            next = start.addingTimeInterval(days)
+        }
         let calendars = calendar != nil ? [calendar!] : []
 
-        let predicate = Store.predicateForEvents(withStart: now, end: next, calendars: calendars)
+        let predicate = Store.predicateForEvents(withStart: start, end: next, calendars: calendars)
 
         let events = Store.events(matching: predicate)
 
