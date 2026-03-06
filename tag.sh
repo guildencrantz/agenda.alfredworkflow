@@ -9,26 +9,26 @@ latest=$(/usr/libexec/PlistBuddy -c "Print :version" info.plist)
 base="${latest%%-*}"
 pre_part=""
 if [ "$latest" != "$base" ]; then
-    pre_part="${latest#*-}"          # e.g. "beta2"
-    pre_type="${pre_part%%[0-9]*}"   # e.g. "beta"
-    pre_num="${pre_part#$pre_type}"  # e.g. "2"
+    pre_part="${latest#*-}"          # e.g. "beta.2"
+    pre_type="${pre_part%%.*}"        # e.g. "beta"
+    pre_num="${pre_part#*.}"         # e.g. "2"
     if [ -z "$pre_num" ]; then pre_num=1; fi
 fi
 
 if [ -n "$pre_part" ]; then
     # Current version is a pre-release — ask to increment first
     next_num=$((pre_num + 1))
-    read -p "Current version is v$latest. Increment to ${pre_type}${next_num}? [Y/n]: " inc
+    read -p "Current version is v$latest. Increment to ${pre_type}.${next_num}? [Y/n]: " inc
     case $inc in
     n|N|no)
         # Ask about category change
         if [ "$pre_type" = "alpha" ]; then
-            read -p "Promote to beta1? [Y/n]: " promote
+            read -p "Promote to beta.1? [Y/n]: " promote
             case $promote in
             n|N|no)
                 echo "Aborted."; exit 0 ;;
             *)
-                new_pre="beta1" ;;
+                new_pre="beta.1" ;;
             esac
         else
             # beta -> release
@@ -42,7 +42,7 @@ if [ -n "$pre_part" ]; then
         fi
         ;;
     *)
-        new_pre="${pre_type}${next_num}"
+        new_pre="${pre_type}.${next_num}"
         ;;
     esac
 
@@ -71,7 +71,7 @@ else
         p|patch) patch=$((patch+1)) ;;
     esac
     new_version="$major.$minor.$patch"
-    if [ -n "$pre" ]; then new_version="$new_version-${pre}1"; fi
+    if [ -n "$pre" ]; then new_version="$new_version-${pre}.1"; fi
     read -e -p "Tag message: " tag_msg
     commit_msg="chore: bump version to $new_version"
 fi
