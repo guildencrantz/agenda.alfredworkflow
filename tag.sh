@@ -1,108 +1,59 @@
 #!/usr/bin/env bash
 set -e
 
-cd "$(dirname "$0")/.."
-
-latest=$(/usr/libexec/PlistBuddy -c "Print :version" info.plist)
-pre_suffix="${latest#*-}"
-if [ "$pre_suffix" = "$latest" ]; then pre_suffix=""; fi
-
-force_push=0
-
-if [ -n "$pre_suffix" ]; then
-    read -p "Current version is v$latest. Re-tag this version? [y/N]: " retag
-    case $retag in
-    y|Y|yes)
-        new_version="$latest"
-        commit_msg="chore: retag v$new_version"
-        force_push=1
-        ;;
-    *)
-        if [ "$pre_suffix" = "alpha" ]; then proposed_pre="beta"
-        else proposed_pre=""; fi
-        if [ -n "$proposed_pre" ]; then
-            read -p "Promote to -$proposed_pre? [Y/n]: " confirm
-            case $confirm in n|N|no) proposed_pre="" ;; esac
-        fi
-        base="${latest%%-*}"
-        new_version="$base"
-        if [ -n "$proposed_pre" ]; then new_version="$new_version-$proposed_pre"; fi
-        commit_msg="chore: bump version to $new_version"
-        ;;
-    esac
-else
-    while true; do
-        read -p "Release type? [M]ajor / [m]inor / [p]atch: " release_type
-        case $release_type in M|major|m|minor|p|patch) break ;;
-        *) echo "Please enter M, m, or p." ;; esac
-    done
-    read -p "Pre-release suffix? [a]lpha / [b]eta / empty for none: " pre
-    case $pre in a) pre=alpha ;; b) pre=beta ;; esac
-    base="$latest"
-    major=$(echo $base | cut -d. -f1)
-    minor=$(echo $base | cut -d. -f2)
-    patch=$(echo $base | cut -d. -f3)
-    case $release_type in
-        M|major) major=$((major+1)); minor=0; patch=0 ;;
-        m|minor) minor=$((minor+1)); patch=0 ;;
-        p|patch) patch=$((patch+1)) ;;
-    esac
-    new_version="$major.$minor.$patch"
-    if [ -n "$pre" ]; then new_version="$new_version-$pre"; fi
-    commit_msg="chore: bump version to $new_version"
-fi
-
-echo "Tagging as v$new_version"
-/usr/libexec/PlistBuddy -c "Set :version $new_version" info.plist
-git add info.plist
-git commit -m "$commit_msg"
-if [ "$force_push" = "1" ]; then
-    git tag -f "v$new_version"
-else
-    git tag "v$new_version"
-fi
-if [ "$force_push" = "1" ]; then
-    echo "Tagged v$new_version — run: git push --force origin v$new_version && git push"
-else
-    echo "Tagged v$new_version — run: git push --follow-tags"
-fi
-
-#!/usr/bin/env bash
-set -e
-
 cd "$(dirname "$0")"
 
 latest=$(/usr/libexec/PlistBuddy -c "Print :version" info.plist)
-pre_suffix="${latest#*-}"
-if [ "$pre_suffix" = "$latest" ]; then pre_suffix=""; fi
 
-force_push=0
+# Parse: pre_type (alpha/beta) and pre_num (1,2,...) from e.g. 1.1.0-beta2
+base="${latest%%-*}"
+pre_part=""
+if [ "$latest" != "$base" ]; then
+    pre_part="${latest#*-}"          # e.g. "beta2"
+    pre_type="${pre_part%%[0-9]*}"   # e.g. "beta"
+    pre_num="${pre_part#$pre_type}"  # e.g. "2"
+    if [ -z "$pre_num" ]; then pre_num=1; fi
+fi
 
-if [ -n "$pre_suffix" ]; then
-    prev_tag_msg=$(git tag -n1 "v$latest" 2>/dev/null | sed 's/^[^ ]* *//')
-    read -p "Current version is v$latest. Re-tag this version? [y/N]: " retag
-    case $retag in
-    y|Y|yes)
-        new_version="$latest"
-        commit_msg="chore: retag v$new_version"
-        force_push=1
-        read -e -p "Tag message: " -i "$prev_tag_msg" tag_msg
+if [ -n "$pre_part" ]; then
+    # Current version is a pre-release — ask to increment first
+    next_num=$((pre_num + 1))
+    read -p "Current version is v$latest. Increment to ${pre_type}${next_num}? [Y/n]: " inc
+    case $inc in
+    n|N|no)
+        # Ask about category change
+        if [ "$pre_type" = "alpha" ]; then
+            read -p "Promote to beta1? [Y/n]: " promote
+            case $promote in
+            n|N|no)
+                echo "Aborted."; exit 0 ;;
+            *)
+                new_pre="beta1" ;;
+            esac
+        else
+            # beta -> release
+            read -p "Promote to full release (drop pre-release suffix)? [Y/n]: " promote
+            case $promote in
+            n|N|no)
+                echo "Aborted."; exit 0 ;;
+            *)
+                new_pre="" ;;
+            esac
+        fi
         ;;
     *)
-        if [ "$pre_suffix" = "alpha" ]; then proposed_pre="beta"
-        else proposed_pre=""; fi
-        if [ -n "$proposed_pre" ]; then
-            read -p "Promote to -$proposed_pre? [Y/n]: " confirm
-            case $confirm in n|N|no) proposed_pre="" ;; esac
-        fi
-        base="${latest%%-*}"
-        new_version="$base"
-        if [ -n "$proposed_pre" ]; then new_version="$new_version-$proposed_pre"; fi
-        commit_msg="chore: bump version to $new_version"
-        read -e -p "Tag message: " -i "$prev_tag_msg" tag_msg
+        new_pre="${pre_type}${next_num}"
         ;;
     esac
+
+    new_version="$base"
+    if [ -n "$new_pre" ]; then new_version="$new_version-$new_pre"; fi
+    prev_tag_msg=$(git tag -n1 "v$latest" 2>/dev/null | sed 's/^[^ ]* *//')
+    read -e -p "Tag message: " -i "$prev_tag_msg" tag_msg
+    commit_msg="chore: bump version to $new_version"
+
 else
+    # Stable release — ask for bump type and optional pre-release
     while true; do
         read -p "Release type? [M]ajor / [m]inor / [p]atch: " release_type
         case $release_type in M|major|m|minor|p|patch) break ;;
@@ -110,7 +61,7 @@ else
     done
     read -p "Pre-release suffix? [a]lpha / [b]eta / empty for none: " pre
     case $pre in a) pre=alpha ;; b) pre=beta ;; esac
-    base="$latest"
+
     major=$(echo $base | cut -d. -f1)
     minor=$(echo $base | cut -d. -f2)
     patch=$(echo $base | cut -d. -f3)
@@ -120,22 +71,14 @@ else
         p|patch) patch=$((patch+1)) ;;
     esac
     new_version="$major.$minor.$patch"
-    if [ -n "$pre" ]; then new_version="$new_version-$pre"; fi
-    commit_msg="chore: bump version to $new_version"
+    if [ -n "$pre" ]; then new_version="$new_version-${pre}1"; fi
     read -e -p "Tag message: " tag_msg
+    commit_msg="chore: bump version to $new_version"
 fi
 
 echo "Tagging as v$new_version"
 /usr/libexec/PlistBuddy -c "Set :version $new_version" info.plist
 git add info.plist
 git commit -m "$commit_msg"
-if [ "$force_push" = "1" ]; then
-    git tag -f -a "v$new_version" -m "$tag_msg"
-else
-    git tag -a "v$new_version" -m "$tag_msg"
-fi
-if [ "$force_push" = "1" ]; then
-    echo "Tagged v$new_version — run: git push --force origin v$new_version && git push"
-else
-    echo "Tagged v$new_version — run: git push --follow-tags"
-fi
+git tag -a "v$new_version" -m "$tag_msg"
+echo "Tagged v$new_version — run: git push --follow-tags"
