@@ -32,6 +32,7 @@ var UpcomingEvents = (function() {
         let endDate = parsed.end
 
         const eventTS = new Date(parsed.start.replace(' ', 'T'))
+        const endTS = new Date(parsed.end.replace(' ', 'T'))
         const isOverdue = eventTS < todayTS
         const isToday = parsed.start.includes(todayDateString)
         const isTomorrow = parsed.start.includes(tomorrowDateString)
@@ -112,11 +113,17 @@ var UpcomingEvents = (function() {
         if (todayOnly) subtitle = subtitle.replace('Today at ', '')
 
         busycalURI = encodeURI(`busycalevent://find/${parsed.calendar}/${parsed.title}/${eventTSisoSeconds}`)
+        // If the current time is in the meeting time range, set arge to `c:${findURI}` and `parsed.meeting_url`
+        const findURI = `find/${encodeURIComponent(parsed.calendar)}/${encodeURIComponent(parsed.title)}/${eventTSisoSeconds}`
+        let arg = $.getenv('use_busycal') ? c:${busycalURI}` : `c:${findURI}`
+        if (eventTS < todayTS && todayTS < endTS) {
+          arg += `,${parsed.meeting_url}`
+        }
 
         items.push({
           title: parsed.title,
           subtitle,
-          arg: $.getenv('use_busycal') ? `c:${busycalURI}` : `c:${eventStartDate}`,
+          arg: `c:${busycalURI}` : arg,
           autocomplete: parsed.title,
           icon: {
             path: `icons/${icon}.png`,
