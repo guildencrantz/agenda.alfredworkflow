@@ -103,7 +103,6 @@ public final class CalendarEvents {
         excludePatterns: [String] = []
     ) {
         let cal = listName != nil ? self.calendar(withName: listName!) : nil
-        let semaphore = DispatchSemaphore(value: 0)
 
         let now = Date()
         let start = startOfDay
@@ -120,7 +119,14 @@ public final class CalendarEvents {
         }
         let calendars = cal != nil ? [cal!] : []
 
-        let regexes = excludePatterns.compactMap {
+        var allPatterns = excludePatterns
+        if let envPatterns = ProcessInfo.processInfo
+            .environment["AGENDA_EXCLUDE_PATTERNS"] {
+            allPatterns += envPatterns.split(separator: ",")
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { !$0.isEmpty }
+        }
+        let regexes = allPatterns.compactMap {
             try? NSRegularExpression(
                 pattern: $0, options: .caseInsensitive)
         }
@@ -139,14 +145,9 @@ public final class CalendarEvents {
             }
         }
 
-        if filtered.count == 0 { semaphore.signal() }
-
         for event in filtered {
             print(format(event))
-            semaphore.signal()
         }
-
-        semaphore.wait()
     }
 
     func addEvent(string: String, toListNamed name: String, startDate: String, endDate: String?, location: String?) {

@@ -5,16 +5,12 @@ var UpcomingEvents = (function() {
       app.includeStandardAdditions = true;
 
       const flags = todayOnly ? '--start-of-day --limit 0' : `--limit ${limit}`
-      let excludeFlags = ''
+      let excludeEnv = ''
       try {
         const patterns = $.getenv('event_exclude_patterns')
-        if (patterns) {
-          excludeFlags = patterns.split(',')
-            .map(p => p.trim()).filter(p => p.length > 0)
-            .map(p => ` --exclude "${p}"`).join('')
-        }
+        if (patterns) excludeEnv = `export AGENDA_EXCLUDE_PATTERNS='${patterns}'; `
       } catch(_) {}
-      const events = app.doShellScript(`./agenda events${listName ? ` "${listName}"`: ''} ${flags}${excludeFlags};`)
+      const events = app.doShellScript(`${excludeEnv}./agenda events${listName ? ` "${listName}"`: ''} ${flags}`)
 
       const todayTS = new Date()
       const todayDate = todayTS.getDate() < 10 ? `0${todayTS.getDate()}` : todayTS.getDate();
