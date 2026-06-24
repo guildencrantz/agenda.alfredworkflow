@@ -8,11 +8,7 @@ var require = function (path) {
   var contents = app.read(handle);
   app.closeAccess(path);
 
-  var module = {exports: {}};
-  var exports = module.exports;
-  eval(contents);
-
-  return module.exports;
+  return eval('(function() { var module = {exports:{}}; var exports = module.exports; ' + contents + '; return module.exports; })()');
 };
 
 ObjC.import('Foundation');
